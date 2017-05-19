@@ -20,5 +20,12 @@
   },
   "devDependencies": {
     "babel-preset-es2015": "^6.24.0"
+  },
+  "push": {
+    "dev": {
+      "url": "git@github.com:shang-demo/commandline-tools.git",
+      "remote": "origin",
+      "branch": "master"
+    }
   }
 }
