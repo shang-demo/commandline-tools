@@ -1,0 +1,3 @@
+#!/usr/bin/env node
+
+require('../.babel-translate/commit-file-jshint/index.js');
