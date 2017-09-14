@@ -11,7 +11,8 @@
   },
   "bin": {
     "typings": "./bin/typings",
-    "diffj": "./bin/diffj"
+    "diffj": "./bin/diffj",
+    "eject": "./bin/eject"
   },
   "babel": {
     "presets": [
