@@ -6,7 +6,7 @@ const spawn = require('child_process').spawn;
 
 const svc = {
   getProjectPath: function () {
-    return process.argv[2] ? path.join(process.cwd(), process.argv[2]) : process.cwd();
+    return process.argv[2] ? path.resolve(process.cwd(), process.argv[2]) : process.cwd();
   },
   getFiles: function (dirPath, options = {}) {
     return Promise

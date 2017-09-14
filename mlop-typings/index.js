@@ -8,7 +8,7 @@ const jsLibraryMappingsXmlLocalDataPath = path.join(__dirname, 'data/jsLibraryMa
 const librariesLocalDataPath = path.join(__dirname, 'data/libraries/shang_auto_generate.xml');
 
 const projectPath = getProjectPath();
-const serverPath = path.join(projectPath, 'server');
+let serverPath = path.join(projectPath, 'server');
 const autoGeneratePath = path.join(projectPath, 'typings/shang-auto-generate.d.ts');
 const ideaPath = path.join(projectPath, '.idea');
 const jsLibraryMappingsXmlPath = path.join(ideaPath, 'jsLibraryMappings.xml');
@@ -16,6 +16,13 @@ const librariesPath = path.join(ideaPath, 'libraries');
 const librariesName = 'shang_auto_generate.xml';
 const typingsPath = path.join(projectPath, 'typings');
 
+
+let typingScope = 'server';
+
+if (process.argv[3] === 'sails') {
+  serverPath = projectPath;
+  typingScope = 'api';
+}
 
 const ignoreErrors = true;
 const configs = {
@@ -214,9 +221,9 @@ function replaceJsLibraryMappings() {
     })
     .then(function (buffer) {
       var data = buffer.toString();
-      data = data.replace(/\s*<file url="file:\/\/\$PROJECT_DIR\$\/server" libraries="{shang-auto-generate}" \/>\n/g, '');
+      data = data.replace(/\s*<file url="file:\/\/\$PROJECT_DIR\$\/(server|api)" libraries="{shang-auto-generate}" \/>\n/g, '');
       data = data.replace(/,\s*shang-auto-generate/gi, '');
-      data = data.replace(`<component name="JavaScriptLibraryMappings">`, `<component name="JavaScriptLibraryMappings">\n    <file url="file://$PROJECT_DIR$/server" libraries="{shang-auto-generate}" />\n`);
+      data = data.replace(`<component name="JavaScriptLibraryMappings">`, `<component name="JavaScriptLibraryMappings">\n    <file url="file://$PROJECT_DIR$/${typingScope}" libraries="{shang-auto-generate}" />\n`);
       return fs.writeFileAsync(jsLibraryMappingsXmlPath, data);
     })
     .then(function () {
