@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 const promisify = function (func) {
   return function (...args) {
@@ -115,6 +116,43 @@ async function start() {
   ]);
 
   await exec(`mv ${srcPath}/index.html ${srcPath}/index.ejs`);
+
+  // css => scss
+  await exec(`mv ${srcPath}/styles.css ${srcPath}/styles.scss`);
+  await replace(webpackConfigPath, [
+    [
+      /styles\.css/g,
+      'styles.scss',
+    ]
+  ]);
+
+  // ngx-progressbar
+  console.info('npm i -S shang-package/ngx-progressbar#package');
+  await exec(`npm i -S shang-package/ngx-progressbar#package`);
+
+  let sharedPath = path.resolve(__dirname, 'data/shared');
+  await exec(`cp -r "${sharedPath}" ${srcPath}/app`);
+  await exec(`rm "${srcPath}/app/app.component.spec.ts"`);
+
+  await replace(`${srcPath}/app/app.module.ts`, [
+    [
+      'import { AppComponent } from \'./app.component\';',
+      'import { HTTP_INTERCEPTORS } from \'@angular/common/http\';\nimport { NgProgressInterceptor } from \'ngx-progressbar\';\nimport { SharedModule } from \'./shared/shared.module\';\nimport { AppComponent } from \'./app.component\';'
+    ],
+    [
+      /BrowserModule,?(\s+)?\n/,
+      'BrowserModule,\n    SharedModule,\n'
+    ],
+    [
+      /providers: \[],?(\s+)?\n/,
+      'providers: [\n    {\n      provide: HTTP_INTERCEPTORS,\n      useClass: NgProgressInterceptor,\n      multi: true,\n    },\n  ],'
+    ]
+  ]);
+
+  let html = '<div>\n  <ng-progress color="blue"></ng-progress>\n</div>';
+  await exec(`echo "${html}" > "${srcPath}/app/app.component.html"`);
+
+
 }
 
 start()
