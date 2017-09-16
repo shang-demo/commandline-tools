@@ -20,6 +20,7 @@ const writeFile = promisify(fs.writeFile);
 const {
   webpackConfigPath,
   tslintPath,
+  tsConfigPath,
   mainTsPath,
   typingsDTsPath,
   mainTsReplace,
@@ -152,7 +153,29 @@ async function start() {
   let html = '<div>\n  <ng-progress color="blue"></ng-progress>\n</div>';
   await exec(`echo "${html}" > "${srcPath}/app/app.component.html"`);
 
+  // apollo-angular
+  console.info(`npm i -S apollo-client apollo-angular graphql-tag`);
+  await exec(`npm i -S apollo-client apollo-angular graphql-tag`);
 
+  await replace(tsConfigPath, [
+    /"dom",?(\s+)?\n/,
+    '"dom",\n      "esnext.asynciterable"\n',
+  ]);
+
+  let utilsPath = path.resolve(__dirname, 'data/utils');
+  await exec(`cp -r "${utilsPath}" ${srcPath}/app`);
+
+  await replace(`${srcPath}/app/app.module.ts`, [
+    [
+      'import { NgProgressInterceptor } from \'ngx-progressbar\';',
+      'import { NgProgressInterceptor } from \'ngx-progressbar\';\n' +
+      'import { ApolloModule } from \'apollo-angular\';\n\nimport { provideClient } from \'./utils/apollo-client/provide-client\';'
+    ],
+    [
+      /SharedModule,?(\s+)?\n/,
+      'SharedModule,\n    ApolloModule.forRoot(provideClient),\n'
+    ],
+  ]);
 }
 
 start()

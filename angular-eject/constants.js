@@ -4,6 +4,7 @@ const { getProjectPath } = require('../Util/index');
 const projectPath = getProjectPath();
 const webpackConfigPath = path.resolve(projectPath, 'webpack.config.js');
 const tslintPath = path.resolve(projectPath, 'tslint.json');
+const tsConfigPath = path.resolve(projectPath, 'tsconfig.json');
 const mainTsPath = path.resolve(projectPath, 'src/main.ts');
 const typingsDTsPath = path.resolve(projectPath, 'src/typings.d.ts');
 const packaheJsonPath = path.resolve(projectPath, 'package.json');
@@ -56,6 +57,7 @@ const isProd = (process.env.NODE_ENV || '').trim() === 'production';
 module.exports = {
   webpackConfigPath,
   tslintPath,
+  tsConfigPath,
   mainTsPath,
   typingsDTsPath,
   mainTsReplace,
