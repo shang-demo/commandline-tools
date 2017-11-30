@@ -45,6 +45,10 @@ const configs = {
     path: path.join(projectPath, 'node_modules', 'mlop-errors'),
     fun: getErrors,
   },
+  wifiPlatformErrorsDeclare: {
+    path: path.join(projectPath, 'node_modules', 'wifiplatform-errors'),
+    fun: getErrors,
+  },
   frameworkDeclare: {
     fun: getFramework,
     name: 'framework',
@@ -102,7 +106,7 @@ function getErrors(config) {
   var str = 'let errorRturn: { respons():Object };\nlet Errors: {\n  OperationalError(): void,';
   return Promise
     .map(Object.keys(errors), function (key) {
-      return '  ' + key + '(): errorRturn,';
+      return '  ' + key + '(message?:any, extra?:any): errorRturn,';
     })
     .then(function (arr) {
       return str + '\n' + arr.join('\n') + '\n}\ndeclare let Errors: Errors;';
@@ -280,6 +284,7 @@ function init() {
           'fsExtraDeclare',
           'frameworkDeclare',
           'mlopErrorsDeclare',
+          'wifiPlatformErrorsDeclare',
           'modelsDeclare',
           'servicesDeclare',
         ].map((name) => {
