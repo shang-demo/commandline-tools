@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 
-rm -r .babel-translate/
+rm -r release/
 
-babel ./Util --out-dir ./.babel-translate/Util
+babel ./Util --out-dir ./release/Util
 
-babel ./mlop-typings --out-dir ./.babel-translate/mlop-typings
-cp -r ./mlop-typings/data ./.babel-translate/mlop-typings/data
+babel ./mlop-typings --out-dir ./release/mlop-typings
+cp -r ./mlop-typings/data ./release/mlop-typings/data
 
-babel ./commit-file-jshint --out-dir ./.babel-translate/commit-file-jshint
+babel ./commit-file-jshint --out-dir ./release/commit-file-jshint
 
-babel ./angular-eject --out-dir ./.babel-translate/angular-eject
-cp -r ./angular-eject/data ./.babel-translate/angular-eject/data
+babel ./angular-eject --out-dir ./release/angular-eject
+cp -r ./angular-eject/data ./release/angular-eject/data
+
+cp bin/* release/
+
+cat package.json | jq '{name: .name, version: .version, dependencies: .dependencies, bin: {typings: "./typings",diffj: "./diffj"}}' > release/package.json
