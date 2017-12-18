@@ -3,10 +3,11 @@ const path = require('path');
 const fs = Promise.promisifyAll(require('fs-extra'));
 const exec = require('child_process').exec;
 const spawn = require('child_process').spawn;
+const flattenDeep = require('lodash.flattendeep');
 
 const svc = {
-  getProjectPath: function () {
-    return process.argv[2] ? path.resolve(process.cwd(), process.argv[2]) : process.cwd();
+  getProjectPath: function (index = 2) {
+    return process.argv[index] ? path.resolve(process.cwd(), process.argv[index]) : process.cwd();
   },
   getFiles: function (dirPath, options = {}) {
     return Promise
@@ -139,6 +140,44 @@ const svc = {
     }
     return action().then(svc.promiseWhile.bind(null, condition, action));
   }),
+  async getDeepFiles(dirPath, { extname = null, deep = null, exclude = ['.git', '.idea', 'node_modules'] } = {}) {
+    let stat = await fs.statAsync(dirPath);
+
+    // 如果是文件, 直接返回数据
+    if (stat.isFile()) {
+      if (extname && dirPath.match(extname)) {
+        return [];
+      }
+
+      return [dirPath];
+    }
+
+    if (deep === 0) {
+      return [];
+    }
+    if (deep) {
+      deep = deep - 1;
+    }
+
+    let fileNames = await fs.readdirAsync(dirPath);
+
+    let filePaths = fileNames
+      .filter((fileName) => {
+        if (exclude && exclude.length) {
+          return exclude.indexOf(fileName) < 0;
+        }
+        return true;
+      })
+      .map((fileName) => {
+        return path.join(dirPath, fileName);
+      });
+
+    let files = await Promise.map(filePaths, (filePath) => {
+      return svc.getDeepFiles(filePath, { extname, deep });
+    });
+
+    return flattenDeep(files);
+  },
 };
 
 

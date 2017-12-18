@@ -1,5 +1,5 @@
 . ~/.nvm/nvm.sh
-nvm use 8;
+nvm use 9;
 npm unlink;
 npm link;
 
